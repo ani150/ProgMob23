@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">TowerOfHanoi</string>
+    <string name="tower_of_hanoi">Tower Of Hanoi</string>
 </resources>

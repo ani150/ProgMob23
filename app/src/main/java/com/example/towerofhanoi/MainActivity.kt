@@ -30,13 +30,13 @@ class MainActivity : AppCompatActivity() {
         orangeRing.setOnTouchListener(MyTouchListener())
 
         // Setter onDraListener på de fire konteinerne (alle av type LinearLayout):
-        val left = findViewById<LinearLayout>(R.id.left)
+        val left = findViewById<LinearLayout>(R.id.tower1)
         left.setOnDragListener(MyDragListener())
 
-        val middle = findViewById<LinearLayout>(R.id.middle)
+        val middle = findViewById<LinearLayout>(R.id.tower2)
         middle.setOnDragListener(MyDragListener())
 
-        val right = findViewById<LinearLayout>(R.id.right)
+        val right = findViewById<LinearLayout>(R.id.tower3)
         right.setOnDragListener(MyDragListener())
     }
 
@@ -96,6 +96,7 @@ class MainActivity : AppCompatActivity() {
                         owner.removeView(draggedView)
                         // Legger draggedView til motakkskonteiner:
                         receiveContainer.addView(draggedView)
+//                        toTower.addView(draggedRing, 0)
                     }
                     draggedView.visibility = View.VISIBLE
                 }

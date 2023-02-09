@@ -1,56 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout android:layout_width="match_parent"
-android:layout_height="wrap_content"
-android:layout_below="@+id/textViewLeaveRemainingDescription"
-android:stretchColumns="0,1"
-xmlns:android="http://schemas.android.com/apk/res/android">
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:weightSum="3">
 
-<TableRow>
-    <LinearLayout
-        android:id="@+id/left"
-        android:layout_height="200dp"
-        android:orientation="vertical"
-        android:padding="10dp"
-        android:background="@drawable/tower_shape_droptarget" >
 
-        <ImageView
-            android:id="@+id/blueRing"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:src="@drawable/blue_ring" />
-    </LinearLayout>
+    <TextView
+        android:id="@+id/Title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:text="@string/tower_of_hanoi"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="#2AA62F"
+        android:textSize="34sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/tower2"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <LinearLayout
-        android:id="@+id/middle"
-        android:layout_height="200dp"
-        android:orientation="vertical"
-        android:padding="10dp"
+        android:id="@+id/tower1"
+        android:layout_width="0dp"
+        android:layout_height="180dp"
+        android:layout_margin="20dp"
         android:layout_weight="1"
+        android:background="@drawable/tower_shape"
         android:gravity="bottom|center_horizontal"
-        android:background="@drawable/tower_shape_droptarget" >
+        android:orientation="vertical"
+        android:paddingBottom="30dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/tower2"
+        app:layout_constraintTop_toBottomOf="@id/Title"
+        tools:layout_editor_absoluteY="275dp">
 
         <ImageView
             android:id="@+id/redRing"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:src="@drawable/red_ring" />
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:scaleType="fitXY"
+            android:src="@drawable/red_ring"
+            android:tag="RØD" />
 
-    </LinearLayout>
-</TableRow>
-
-<TableRow>
-
-    <LinearLayout
-        android:id="@+id/right"
-        android:layout_height="200dp"
-        android:orientation="vertical"
-        android:padding="10dp"
-        android:background="@drawable/tower_shape_droptarget" >
+        <ImageView
+            android:id="@+id/blueRing"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:scaleType="fitXY"
+            android:src="@drawable/blue_ring"
+            android:tag="RØD" />
 
         <ImageView
             android:id="@+id/orangeRing"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:src="@drawable/orange_ring" />
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:scaleType="fitXY"
+            android:src="@drawable/orange_ring"
+            android:tag="RØD" />
     </LinearLayout>
-</TableRow>
-</TableLayout>
+
+    <LinearLayout
+        android:id="@+id/tower2"
+        android:layout_width="0dp"
+        android:layout_height="180dp"
+        android:layout_margin="20dp"
+        android:background="@drawable/tower_shape"
+        android:gravity="bottom|center_horizontal"
+        android:orientation="vertical"
+        android:paddingBottom="30dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/tower1"
+        app:layout_constraintRight_toLeftOf="@id/tower3"
+        app:layout_constraintTop_toBottomOf="@id/Title">
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/tower3"
+        android:layout_width="0dp"
+        android:layout_height="180dp"
+        android:layout_margin="20dp"
+        android:background="@drawable/tower_shape"
+        android:gravity="bottom|center_horizontal"
+        android:orientation="vertical"
+        android:paddingBottom="30dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/tower2"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/Title">
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
