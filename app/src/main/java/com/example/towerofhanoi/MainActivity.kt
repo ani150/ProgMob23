@@ -5,6 +5,7 @@ import android.content.ClipData
 import android.graphics.drawable.Drawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.DragEvent
 import android.view.MotionEvent
 import android.view.View
@@ -16,14 +17,43 @@ import android.widget.TextClock
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
+import java.util.*
+import kotlin.concurrent.timerTask
 
+const val GAME_STATE = "STATE"
+const val MY_DEBUG_TAG = "ANI_MELDINGER"
 class MainActivity : AppCompatActivity() {
+
+    var seconds: Int=0
+    lateinit var clock: TextView
+    var gameState: String? = null
+    var movesInt: Int = 0
+    lateinit var moves: TextView
+
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString(GAME_STATE, this.gameState)
+        outState.putInt("seconds", seconds)
+        outState.putInt("moves", movesInt)
+
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        seconds = savedInstanceState.getInt("seconds", 0)
+        movesInt = savedInstanceState.getInt("moves", 0)
+        moves.text = movesInt.toString()
+        clock.text = seconds.toString()
+
+
+    }
     @SuppressLint("ClickableViewAccessibility", "SetTextI18n", "MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_main)
 
-        // Setter onTouchListener på alle fire ImageView. Brukes til å starte "dragAndDrop".
         val blueRing = findViewById<ImageView>(R.id.blueRing)
         blueRing.setOnTouchListener(MyTouchListener())
 
@@ -33,7 +63,6 @@ class MainActivity : AppCompatActivity() {
         val orangeRing = findViewById<ImageView>(R.id.orangeRing)
         orangeRing.setOnTouchListener(MyTouchListener())
 
-        // Setter onDraListener på de fire konteinerne (alle av type LinearLayout):
         val left = findViewById<LinearLayout>(R.id.tower1)
         left.setOnDragListener(MyDragListener())
 
@@ -43,35 +72,46 @@ class MainActivity : AppCompatActivity() {
         val right = findViewById<LinearLayout>(R.id.tower3)
         right.setOnDragListener(MyDragListener())
 
-        var moves = findViewById<TextView>(R.id.moves)
+        moves = findViewById<TextView>(R.id.moves)
         moves.text = 0.toString()
 
         val restartButton = findViewById<Button>(R.id.restartButton)
-        restartButton.setOnClickListener { this.recreate() }
+        restartButton.setOnClickListener { view -> this@MainActivity.recreate();
+            seconds = 0;
+            movesInt = 0;
+            moves.text = movesInt.toString();
+            clock.text = seconds.toString()}
 
-        var clock = findViewById<TextView>(R.id.textClock)
+        clock = findViewById<TextView>(R.id.textClock)
         clock.text = "00:00:00"
+
+        var timer = Timer()
+        timer.scheduleAtFixedRate(
+            timerTask {
+                seconds++
+                this@MainActivity.runOnUiThread({ clock.text = seconds.toString() })
+
+            },
+            0,
+            1000
+        )
 
 
     }
 
-    // Ikonene/bildene håndterer onTouch & start "drag":
     inner class MyTouchListener : View.OnTouchListener {
         override fun onTouch(viewToBeDragged: View, motionEvent: MotionEvent): Boolean {
             // Starter "drag"-operasjon:
             val owner = viewToBeDragged.parent as LinearLayout
             val top = owner.getChildAt(0)
             return if (viewToBeDragged === top || owner.childCount == 1) {
-                // Data som kan sendes med til "drag-receiver" (brukes ikke her):
+
                 val data = ClipData.newPlainText("", "")
 
-                // Lager en "drag-skygge" av viewet som skal dras (gjør opprinnelig viewToBeDragged usynlig):
                 val shadowBuilder = View.DragShadowBuilder(viewToBeDragged)
 
-                // Starter Drag&Drop, alle View som implemenenterer OnDragListener vil motta onDrag-events.
                 viewToBeDragged.startDragAndDrop(data, shadowBuilder, viewToBeDragged, 0)
 
-                // Gjør bildet som "dragges" usynlig (kun skyggen er nå synlig):
                 viewToBeDragged.visibility = View.INVISIBLE
                 true
             } else {
@@ -82,10 +122,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Denne håndterer drag-drop events for rektanglende/konteinerne:
     inner class MyDragListener : View.OnDragListener {
-        // Alle fire rektangler (LinearLayout) lytter etter drag-events.
-        // Følgende drawables brukes til å sette korrekt bakgrunn.
+
         var enterShape: Drawable? =
             getDrawable(this@MainActivity, R.drawable.tower_shape_droptarget)
         var normalShape: Drawable? = getDrawable(this@MainActivity, R.drawable.tower_shape)
@@ -93,18 +131,17 @@ class MainActivity : AppCompatActivity() {
         override fun onDrag(view: View, event: DragEvent): Boolean {
             val action = event.action
             var cancelDrag = false
-            //Bildet som blir dradd:.
-            val draggedView = event.localState as ImageView
-            // Konteiner som draggedView dras til (som er en av de fire LinearLayout-ene):
-            val receiveContainer = view as LinearLayout
-            when (action) {
-                DragEvent.ACTION_DRAG_STARTED -> {
-                   var clock = findViewById<TextView>(R.id.textClock)
 
-                }
-                DragEvent.ACTION_DRAG_ENTERED ->                     // view er konteineren (her: en av de fire LinearLayout-ene).
+            val draggedView = event.localState as ImageView
+
+            val receiveContainer = view as LinearLayout
+
+            when (action) {
+
+                DragEvent.ACTION_DRAG_STARTED -> {}
+                DragEvent.ACTION_DRAG_ENTERED ->
                     view.setBackground(enterShape)
-                DragEvent.ACTION_DRAG_EXITED ->                     // view er konteineren (her: en av de fire LinearLayout-ene).
+                DragEvent.ACTION_DRAG_EXITED ->
                     view.setBackground(normalShape)
                 DragEvent.ACTION_DROP -> {
 
@@ -117,16 +154,16 @@ class MainActivity : AppCompatActivity() {
                         ||draggedView.id == R.id.redRing
                         ||draggedView.id == R.id.orangeRing) {
                         var moves = findViewById<TextView>(R.id.moves)
-                        var movesInt = moves.text.toString().toInt()
+                        movesInt = moves.text.toString().toInt()
                         movesInt++
                         moves.setText(movesInt.toString()) }
 
                     if (topElement == null || draggedViewWidth < topElementWidth) {
-                        //Remove draggedView from its tower
                         val fromTower = draggedView.parent as LinearLayout
                         fromTower.removeView(draggedView)
                         toTower.addView(draggedView, 0)
                         println("Top element is null")
+
 
 
                         if (toTower.id == R.id.tower3 && toTower.childCount == 3) {
@@ -153,15 +190,15 @@ class MainActivity : AppCompatActivity() {
 
                 }
                 DragEvent.ACTION_DRAG_ENDED -> {
-                    // view er konteineren (her: en av de fire LinearLayout-ene).
                     receiveContainer.background = normalShape
-                    // Gjør viewen som blir dradd synlig igjen (kun skyggen er nå synlig):
                     draggedView.visibility = View.VISIBLE
                 }
                 else -> {}
 
+
             }
             return true
+
         }
     }
 }
